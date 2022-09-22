@@ -1,54 +1,50 @@
-import { useState } from "react";
+import * as React from 'react';
+import { useEffect, useState } from 'react';
+
+import AppBar from './components/AppBar.js';
+import TransactionForm from './components/TransactionForm.js';
 
 function App() {
+  const [transactions, setTransactions] = useState([]);
 
-  const [form, setForm] = useState({
-    amount: 0,
-    description: '',
-    date: '',
-  })
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    const res = await fetch('http://localhost:5000/transaction', {
-      method: 'POST',
-      body: JSON.stringify(form),
-    })
-
-    console.log(res)
+  async function fetchTransactions() {
+    const response = await fetch('http://localhost:5000/transactions');
+    const { data } = await response.json();
+    setTransactions(data);
   }
 
-  const handleInput = (e) => {
-    let name = e.target.name
-    let val = e.target.value
-    setForm({...form, [name]: val})
-  }
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
 
   return (
     <div>
-      <form onSubmit={handleSubmit}>
-        <input 
-          type="number"
-          name="amount"
-          value={form.amount} 
-          onChange={handleInput} 
-          placeholder="Enter Transaction amount" 
-        />
-        <input 
-          type="text"
-          name="description"
-          value={form.description}
-          onChange={handleInput}
-          placeholder="Enter Transaction details" 
-        />
-        <input 
-          type="date" 
-          name="date"
-          value={form.date}
-          onChange={handleInput}
-        />
-        <button type="submit">Submit</button>
-      </form>
+      <AppBar />
+      <TransactionForm fetchTransactions={fetchTransactions} />
+
+      <hr />
+
+      <section>
+        <table>
+          <thead>
+            <tr>
+              <th>Amount</th>
+              <th>Description</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {transactions &&
+              transactions.map((ta) => (
+                <tr key={ta._id}>
+                  <td>{ta.amount}</td>
+                  <td>{ta.description}</td>
+                  <td>{ta.date}</td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </section>
     </div>
   );
 }
