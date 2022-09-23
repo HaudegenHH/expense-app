@@ -1,26 +1,40 @@
-import { Router } from 'express'
-import Transaction from '../models/Transaction.js'
+import { Router } from 'express';
+import Transaction from '../models/Transaction.js';
 
-const router = Router()
-
-
+const router = Router();
 
 router.get('/', async (req, res) => {
   // sorting -1 means: newest to the top
-  const transaction = await Transaction.find({}).sort({ createdAt: -1 })
-  res.json({ data: transaction })
-})
+  const transaction = await Transaction.find({}).sort({ createdAt: -1 });
+  res.json({ data: transaction });
+});
 
 router.post('/', async (req, res) => {
-  const {amount, description, date} = req.body
+  const { amount, description, date } = req.body;
 
   const transaction = new Transaction({
-    amount, description, date
-  })
+    amount,
+    description,
+    date,
+  });
 
-  await transaction.save()
+  await transaction.save();
 
-  res.json({msg: 'saved'})
-})
+  res.json({ msg: 'saved' });
+});
 
-export default router
+router.patch('/:id', async (req, res) => {
+  const { id } = req.params;
+  await Transaction.updateOne({ _id: id }, { $set: req.body });
+  res.json({ msg: 'successfully updated' });
+});
+
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  await Transaction.findOneAndDelete({ _id: id });
+
+  res.json({ msg: 'Success' });
+});
+
+export default router;

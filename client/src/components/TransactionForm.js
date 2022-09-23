@@ -11,7 +11,7 @@ import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
 import Button from '@mui/material/Button';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const InitialForm = {
   amount: 0,
@@ -19,8 +19,18 @@ const InitialForm = {
   date: new Date(),
 };
 
-export default function TransactionForm({ fetchTransactions }) {
+export default function TransactionForm({
+  fetchTransactions,
+  editTransaction,
+  setEditTransaction,
+}) {
   const [form, setForm] = useState(InitialForm);
+
+  useEffect(() => {
+    if (editTransaction.amount !== undefined) {
+      setForm(editTransaction);
+    }
+  }, [editTransaction]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -32,6 +42,16 @@ export default function TransactionForm({ fetchTransactions }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const res =
+      editTransaction.amount === undefined ? await create() : await update();
+    if (res.ok) {
+      setForm(InitialForm);
+      setEditTransaction({});
+      fetchTransactions();
+    }
+  };
+
+  const create = async () => {
     const res = await fetch('http://localhost:5000/transactions', {
       method: 'POST',
       headers: {
@@ -39,10 +59,21 @@ export default function TransactionForm({ fetchTransactions }) {
       },
       body: JSON.stringify(form),
     });
-    if (res.ok) {
-      fetchTransactions();
-      setForm(InitialForm);
-    }
+    return res;
+  };
+
+  const update = async () => {
+    const res = await fetch(
+      `http://localhost:5000/transactions/${editTransaction._id}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      }
+    );
+    return res;
   };
 
   return (
@@ -82,9 +113,16 @@ export default function TransactionForm({ fetchTransactions }) {
               )}
             />
           </LocalizationProvider>
-          <Button type="submit" variant="contained">
-            Submit
-          </Button>
+          {editTransaction.amount !== undefined && (
+            <Button type="submit" variant="contained">
+              Update
+            </Button>
+          )}
+          {editTransaction.amount === undefined && (
+            <Button type="submit" variant="contained">
+              Submit
+            </Button>
+          )}
         </form>
       </CardContent>
     </Card>
