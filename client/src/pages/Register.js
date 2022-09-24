@@ -8,8 +8,9 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import Link from '@mui/material/Link';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 function Copyright(props) {
   return (
@@ -20,7 +21,7 @@ function Copyright(props) {
       {...props}
     >
       {'Copyright © '}
-      <Link color="inherit" href="https://haudegenhh.github.io/portfolio">
+      <Link color="inherit" href="#">
         My Site
       </Link>{' '}
       {new Date().getFullYear()}
@@ -31,14 +32,30 @@ function Copyright(props) {
 
 const theme = createTheme();
 
-export default function SignUp() {
-  const handleSubmit = (event) => {
+export default function Register() {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
+    const user = {
+      firstName: data.get('firstName'),
+      lastName: data.get('lastName'),
       email: data.get('email'),
       password: data.get('password'),
+    };
+    let res = await fetch(`${process.env.REACT_APP_API_URI}/auth/register`, {
+      method: 'POST',
+      body: JSON.stringify(user),
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
+    if (res.ok) {
+      let data = await res.json();
+      console.log(data);
+      navigate('/');
+    }
   };
 
   return (
@@ -119,7 +136,11 @@ export default function SignUp() {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link to="/login">Already have an account? Sign in</Link>
+                <RouterLink to="/login">
+                  <Link component="span" variant="body2">
+                    Already have an account? Sign in
+                  </Link>
+                </RouterLink>
               </Grid>
             </Grid>
           </Box>

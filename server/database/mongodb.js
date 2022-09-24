@@ -1,16 +1,14 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
-import * as dotenv from 'dotenv'
-dotenv.config()
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-const DB_URI = process.env.MONGODB_URI
+const DB_URI = process.env.MONGODB_URI;
 
+function connect() {
+  mongoose.connect(DB_URI);
 
-async function connect() {
-  
-  await mongoose.connect(DB_URI)
-  
-  console.log('Successfully connected to MongoDB')
+  console.log('Successfully connected to MongoDB');
 }
 
-export default connect
+export default connect;

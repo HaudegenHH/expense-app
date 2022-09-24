@@ -22,9 +22,12 @@ export default function TransactionList({
     if (!window.confirm('Are you sure you want to delete this transaction?'))
       return;
 
-    const res = await fetch(`http://localhost:5000/transactions/${id}`, {
-      method: 'DELETE',
-    });
+    const res = await fetch(
+      `${process.env.REACT_APP_API_URI}/transactions/${id}`,
+      {
+        method: 'DELETE',
+      }
+    );
     if (res.ok) {
       window.alert('deleted successfully');
       fetchTransactions();

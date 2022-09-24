@@ -52,7 +52,7 @@ export default function TransactionForm({
   };
 
   const create = async () => {
-    const res = await fetch('http://localhost:5000/transactions', {
+    const res = await fetch(`${process.env.REACT_APP_API_URI}/transactions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ export default function TransactionForm({
 
   const update = async () => {
     const res = await fetch(
-      `http://localhost:5000/transactions/${editTransaction._id}`,
+      `${process.env.REACT_APP_API_URI}/transactions/${editTransaction._id}`,
       {
         method: 'PATCH',
         headers: {

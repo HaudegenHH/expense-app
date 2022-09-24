@@ -1,13 +1,19 @@
 import { Router } from 'express';
 import Transaction from '../models/Transaction.js';
+import passport from 'passport';
 
 const router = Router();
 
-router.get('/', async (req, res) => {
-  // sorting -1 means: newest to the top
-  const transaction = await Transaction.find({}).sort({ createdAt: -1 });
-  res.json({ data: transaction });
-});
+// passport middleware applied to this route
+router.get(
+  '/',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    // sorting -1 means: newest to the top
+    const transaction = await Transaction.find({}).sort({ createdAt: -1 });
+    res.json({ data: transaction });
+  }
+);
 
 router.post('/', async (req, res) => {
   const { amount, description, date } = req.body;
